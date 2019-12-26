@@ -1,0 +1,36 @@
+body {
+	padding: 0;
+	margin:0;
+}
+
+html, body, #mapid {
+	height: 100%;
+	display: block;
+  overflow-y: hidden;
+}
+
+/* leaflet sidebar*/
+
+.leaflet-sidebar-header {
+	background-color: #02419a;
+}
+
+.leaflet-sidebar-content {
+	background-color: rgba(255,255,255,.5);
+	backdrop-filter:blur(6px);
+}
+
+ .leaflet-sidebar-tabs > ul > li.active {
+	 background-color: #02419a;
+ }
+
+ .leaflet-sidebar-tabs {
+	 background-color: #F4F4F4;
+	 box-shadow: 2px 0px 2px 0px #656565;
+ }
+
+/* feather icons */
+.feather-icons {
+	margin-top: 25%;
+	height: 50%;
+}
