@@ -1,36 +1,103 @@
 body {
 	padding: 0;
 	margin:0;
+	font-family: 'abel-regular';
 }
 
 html, body, #mapid {
 	height: 100%;
 	display: block;
   overflow-y: hidden;
+	font-family: 'abel-regular';
+	font-size: .98em;
 }
 
-/* leaflet sidebar*/
-
+/* -------------------------------------------------------------------------- */
+/* 											   		LEAFLET SIDEBAR		 															*/
+/* -------------------------------------------------------------------------- */
 .leaflet-sidebar-header {
 	background-color: #02419a;
+	display: block;
+	position: static;
 }
 
 .leaflet-sidebar-content {
-	background-color: rgba(255,255,255,.5);
+	background-color: rgba(255,255,255,.75);
 	backdrop-filter:blur(6px);
 }
 
- .leaflet-sidebar-tabs > ul > li.active {
+.leaflet-sidebar-tabs > ul > li.active,
+.leaflet-sidebar-tabs > ul > li.active:hover {
 	 background-color: #02419a;
  }
 
- .leaflet-sidebar-tabs {
+.leaflet-sidebar-tabs > ul > li:hover {
+	background-color: rgba(0,0,0,.25);
+	/* opacity: .1; */
+	transition: .2s
+}
+
+.leaflet-sidebar-tabs {
 	 background-color: #F4F4F4;
 	 box-shadow: 2px 0px 2px 0px #656565;
- }
+}
 
 /* feather icons */
 .feather-icons {
 	margin-top: 25%;
 	height: 50%;
+}
+
+#logo_fs {
+	padding-top:10px;
+	height:130px;
+}
+
+#intro {
+	margin-top: 5px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 											   EXPLORER LES ESPACES	 															*/
+/* -------------------------------------------------------------------------- */
+
+#trouvez-moi {
+	left: 15%;
+	background: #02419a;
+	font-family: 'abel-regular';
+	font-size: .95em;
+	display: flex;
+	border: none;
+	border-color: transparent;
+	padding: 10px;
+	border-radius:5px;
+	box-shadow: -0.02px 0 5px rgba(0,0,0,.5);
+	transition: width 0.4s ease-in-out;
+	color: white;
+	cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 													CHAMP DE RECHERCHE 																*/
+/* -------------------------------------------------------------------------- */
+
+#searchField {
+	font-family: 'abel-regular';
+	display: flex;
+	width: 90%;
+	border: none;
+	height: 25px;
+	border-color: transparent;
+	padding: 5px;
+	border-radius: 5px;
+	box-shadow: -0.02px 0 5px rgba(0,0,0,0.2);
+	transition: width 0.4s ease-in-out;
+}
+
+#searchField:focus {
+	outline: none;
+}
+
+#resetSearch {
+	
 }

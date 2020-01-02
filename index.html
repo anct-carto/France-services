@@ -6,20 +6,16 @@
     <link rel="stylesheet" href="lib/leaflet.css">
     <link rel="stylesheet" href="lib/leaflet-sidebar.min.css">
     <link rel="stylesheet" href="lib/awesomplete.min.css">
+    <link rel="stylesheet" href="lib/L.Control.ZoomMin.css">
+    <link rel="stylesheet" href="css/font.css">
     <link rel="stylesheet" href="css/style.css">
-    <script type="text/javascript" src="lib/leaflet.js"></script>
-    <script type="text/javascript" src="lib/leaflet-sidebar.min.js"></script>
-    <script type="text/javascript" src="lib/awesomplete.min.js"></script>
-    <script type="text/javascript" src="lib/feather.min.js"></script>
+    <script src="lib/leaflet.js"></script>
+    <script src="lib/leaflet-sidebar.min.js"></script>
+    <script src="lib/L.Control.ZoomMin.js"></script>
+    <script src="lib/awesomplete.min.js"></script>
+    <script src="lib/feather.min.js"></script>
   </head>
   <body>
-    <!-- barre de recherche -->
-    <!-- <div id="searchBar">
-      <form id="searchBar" method="get">
-        <input type="text" placeholder="Rechercher une commune" id = "searchField">
-      </form>
-    </div> -->
-
    <div id="sidebar" class="leaflet-sidebar collapsed">
        <!-- nav tabs -->
        <div class="leaflet-sidebar-tabs">
@@ -47,33 +43,45 @@
        <div class="leaflet-sidebar-content">
            <div class="leaflet-sidebar-pane" id="home">
                <h1 class="leaflet-sidebar-header">
-                 Carte interactive
+                 Accueil
                  <span class="leaflet-sidebar-close">
                    <i data-feather="skip-back" class="feather-icons"></i>
                  </span>
                </h1>
-
-               <p>Bienvenue sur la carte interactive des maisons France Services<a href="http://leafletjs.com/">Leaflet</a>.</p>
-
-               <h2>More examples</h2>
+               <img src="img/logo_FranceServices-01.png" id = "logo_fs">
+               <h3 id = 'intro'>
+                 Carte interactive des espaces France Services labellisés au 1er janvier 2020
+               </h3>
+               <p>
+                 Piloté par le ministère de la Cohésion des territoires et des Relations avec les collectivités territoriales via l'ANCT,
+                 ce réseau vise à faciliter l’accès des citoyens à un panier de services publics de qualité. Les usagers pourront effectuer
+                 diverses démarches administratives dans un lieu unique et se renseigner auprès d’agents polyvalents, formés de manière pointue et efficace.
+               </p>
+               <button type="button" name="button" id = "trouvez-moi">Trouver un espace France Services</button>
+               <!-- <h2>More examples</h2>
                <ul>
                    <li><a href="./position-right.html">Right aligned</a></li>
                    <li><a href="./halfheight.html">The sidebar adapts to map container size</a></li>
                    <li><a href="./leaflet-latest.html">Proof that it works with the latest leaflet version (if not, please report it!)</a></li>
                    <li><a href="./leaflet-0.7.html">Proof that it works with leaflet 0.7</a></li>
-               </ul>
+               </ul> -->
            </div>
-
            <div class="leaflet-sidebar-pane" id="autopan">
-               <h1 class="leaflet-sidebar-header">
-                   autopan
+               <h2 class="leaflet-sidebar-header">
+                   Rechercher un espace
                    <span class="leaflet-sidebar-close">
-                     <i data-feather="skip-back" class="feather-icons"></i></span>
-               </h1>
+                     <i data-feather="skip-back" class="feather-icons"></i>
+                   </span>
+               </h2>
                <p>
-                   <code>Leaflet.control.sidebar({ autopan: true })</code>
-                   makes shure that the map center always stays visible.
+                 Rechercher un espace France Services
                </p>
+               <div id="searchBar">
+                 <form>
+                   <input type="text" placeholder="Rechercher une commune" id = "searchField">
+                   <input type="reset" id="resetSearch" value='x'>
+                 </form>
+               </div>
                <p>
                    The autopan behviour is responsive as well.
                    Try opening and closing the sidebar from this pane!
