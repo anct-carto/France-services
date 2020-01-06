@@ -78,15 +78,6 @@ window.addEventListener('DOMContentLoaded', () => {
   sidebar.open('home');
 })
 
-// add panels dynamically to the sidebar
-// sidebar
-//     .addPanel({
-//         id:   'js-api',
-//         tab:  '<i data-feather="info" class="feather-icons"></i>',
-//         title: 'JS API',
-//         pane: '<p>The Javascript API allows to dynamically create or modify the panel state.<p/><p><button onclick="sidebar.enablePanel(\'mail\')">enable mails panel</button><button onclick="sidebar.disablePanel(\'mail\')">disable mails panel</button></p><p><button onclick="addUser()">add user</button></b>',
-//     })
-
 // be notified when a panel is opened
 sidebar.on('content', function (ev) {
     switch (ev.id) {
@@ -108,13 +99,11 @@ function addUser() {
   });
 }
 
-feather.replace();
-
 let trouvezMoiBtn = document.getElementById('trouvez-moi');
 
 let searchField = document.getElementById('searchField');
 
-searchField.addEventListener('enter', event => {
+searchField.addEventListener('coucou', event => {
   event.preventDefault();
 })
 
@@ -127,7 +116,6 @@ trouvezMoiBtn.addEventListener('click', () => {
   searchField.select(); 
 });
 
-let maxZoom = 9;
 
 /* -------------------------------------------------------------------------- */
 /*                          COORDONNEES ESPACES                               */
@@ -140,60 +128,199 @@ let customMarker = L.icon({
   // iconAnchor: [12, 30]
 });
 
-console.log(customMarker);
-
+let listFs = [];
 
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
     let france_services = new L.GeoJSON(res,{
-      pointToLayer: (feature,latlng) => {
+      /* pointToLayer: (feature,latlng) => {
         return L.marker(latlng,
           { icon: customMarker})
-      },
+      }, */
       onEachFeature: function (feature,layer) {
         layer.bindTooltip(feature.properties.lib_france_services);
         layer.on('click', function(e) {
-          sidebar.open('autopan');
-          map.flyTo(e.latlng,maxZoom,{animate:true, duration:1})
+          showInfo(feature.properties)
+          zoomTo(e.latlng)
         })
       }
     }).addTo(map);
 
-    listFeatures = res.features.map((e) => {
-      return e.properties.lib_france_services;
+    /* Création d'une liste vide pour accueillir les attributs des entités */
+    let listFeatures = [];
+
+    for (let i in res.features)  {
+      let france_services = res.features[i];
+      
+      /* Remplacement des champs vides par l'attribut 'non renseigné' */
+      for (let j in france_services.properties) {
+        if (france_services.properties[j] == null) {
+          france_services.properties[j] = 'Non renseigné'
+        }
+      };
+      /* Remplissage de la liste par les propriétés des entités */
+      listFeatures.push(france_services)
+    }
+    
+  /* -------------------------------------------------------------------------- */
+  /*                          CHAMP de RECHERCHE                                */
+  /* -------------------------------------------------------------------------- */
+    
+    let listNouns = res.features.map((e) => {
+      return e.properties.lib_com;
     });
 
-    console.log(listFeatures);
     new Awesomplete(searchField,{ //
       minChars: 1,
-      list: listFeatures});
+      list: listNouns
+    });
 
-    searchField.addEventListener('awesomplete-selectcomplete', e => {
-      let value = searchField.value;
-      for (let i in listFeatures) {
-        console.log(listFeatures[i]);     
-        if (listFeatures[i].toLowerCase() == value.toLowerCase()) {
+    
+    searchField.addEventListener('awesomplete-selectcomplete', e => {  
+      let value = searchField.value; 
+      listNouns.forEach(com => {      
+        if (com.toLowerCase() === value.toLowerCase()) {            
           let libCom = value.toString();
           console.log('trouvé'); // vérifier que la commune se trouve dans la liste
-        }
-      }
-    })
-
+          listFeatures.forEach(feature => {         
+            if (feature.properties.lib_com === libCom) {
+              for (let i in feature) {
+                /* affichage de la fiche info */                             
+                showInfo(feature.properties);
+                zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);                
+              }
+            }
+          })
+        }  
+      })
+    });
   });
 
-/* -------------------------------------------------------------------------- */
-/*                          CHAMP de RECHERCHE                                */
-/* -------------------------------------------------------------------------- */
-
-// let searchButton = document.getElementById('searchButton');
-
-// // prevent refresh
-// searchButton.addEventListener('click', function(event){
-//   event.preventDefault();
-// });
 
 /* -------------------------------------------------------------------------- */
-/*                          MARQUEUR PONCTUEL                                 */
+/*                                FICHE INFO                                  */
 /* -------------------------------------------------------------------------- */
+/* Fonction permettant de mettre plusieurs attributs en une fois */
+Element.prototype.setAttributes = function (attrs) {
+  for (var idx in attrs) {
+    if ((idx === 'styles' || idx === 'style') && typeof attrs[idx] === 'object') {
+      for (var prop in attrs[idx]) { this.style[prop] = attrs[idx][prop]; }
+    } else if (idx === 'html') {
+      this.innerHTML = attrs[idx];
+    } else {
+      this.setAttribute(idx, attrs[idx]);
+    }
+  }
+};
 
+/* import des pictos */
+
+/* 1. Création du conteneur accueillant les infos */
+let contentPanel = document.getElementById('autopan');
+let ficheInfo = document.createElement('div')
+ficheInfo.setAttribute('id','ficheInfo');
+
+function showInfo(point) {
+  ficheInfo.innerHTML = '';
+
+  hr = document.createElement('hr');
+  
+  /* Nom de l'espace France services */
+  nomEspace = document.createElement('h3');
+  nomEspace.innerText = point.lib_france_services;
+
+  /* Ligne adresse */
+  let adresse = createPictoInfo('span',point.result_label, 'map-pin');
+
+  /* Création de la table des horaires */
+  ficheHoraire = document.createElement('table');
+  /* Header de la table 'Horaires' */
+  thead = createPictoInfo('thead','Horaires','clock')
+  // thead.appendChild(clock);
+  thead.style.fontWeight = 'bold'
+  ficheHoraire.appendChild(thead);
+
+  /* corps de la table */
+  tbody = document.createElement('tbody');
+  for (let i in point) {
+    if (i[0] == "h") {
+      tr = document.createElement('tr');
+
+      tdJour = document.createElement('td');
+      tdHoraire = document.createElement('td');
+
+      jour = i[2].toUpperCase() + i.substring(3, i.length);
+
+      tdJour.innerText = jour;
+      tdHoraire.innerText = point[i];
+
+      tr.appendChild(tdJour);
+      tr.appendChild(tdHoraire);
+
+      tbody.appendChild(tr);
+    }
+  }
+  
+  ficheHoraire.appendChild(tbody)
+
+  /* Contact */
+  contact = createPictoInfo('span','Contact','send')
+  
+  elements = [hr, nomEspace, adresse, ficheHoraire, contact];
+  elements.forEach(e => {
+    ficheInfo.appendChild(e)
+  })
+
+  /* 3. Ajout des infos */
+  if (sidebar.open('autopan') == true) {  
+      contentPanel.appendChild(ficheInfo);
+  } else {
+    sidebar.open('autopan');
+    contentPanel.appendChild(ficheInfo);
+  };
+};
+
+
+function zoomTo(latlng) {
+  let maxZoom = 9;
+  map.flyTo(latlng, maxZoom, { animate: true, duration: 1 })
+};
+
+/* Générer l'affichage des données accompagné de pictos */
+
+function createPictoInfo(htmlElement,data,picName) {
+  
+  // 1. import du pictogramme
+  picto = document.createElement('img');
+  picto.setAttributes({
+    'src': 'img/'+ picName + '.svg',
+    'class': 'picto-fiche'
+  });
+    
+  // 2. Génération du texte
+  p = document.createElement('p');
+  element_data = document.createTextNode(data);
+
+  // 3. Fusion texte et picto
+  [picto, element_data].forEach(e => {
+    p.appendChild(e);
+  });
+
+  return p;
+}
+
+feather.replace();
+
+
+let refreshBtn = document.querySelector('button#refresh');
+refreshBtn.addEventListener('click', event => {
+  event.preventDefault();
+  searchField.value = ''
+  ficheInfo.innerHTML = '';
+  resetView();
+})
+
+function resetView() {
+  map.setView([46.5, 6.8], 5.5555, { animation: true })
+}

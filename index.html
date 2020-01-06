@@ -26,11 +26,10 @@
                 </a>
                </li>
                <li><a href="#autopan" role="tab">
-                 <i data-feather="map-pin" class = "feather-icons"></i>
+                 <i data-feather="search" class = "feather-icons"></i>
                 </a>
                </li>
            </ul>
-
            <!-- bottom aligned tabs -->
            <ul role="tablist">
                <li><a href="https://github.com/cget-carto/France-services" target="_blank">
@@ -50,7 +49,7 @@
                </h1>
                <img src="img/logo_FranceServices-01.png" id = "logo_fs">
                <h3 id = 'intro'>
-                 Carte interactive des espaces France Services labellisés au 1er janvier 2020
+                 Carte interactive des espaces labellisés au 1er janvier 2020
                </h3>
                <p>
                  Piloté par le ministère de la Cohésion des territoires et des Relations avec les collectivités territoriales via l'ANCT,
@@ -76,11 +75,12 @@
                <p>
                  Rechercher un espace France Services
                </p>
-               <div id="searchBar">
-                 <form>
+               <!-- <div id="searchBar"> -->
                    <input type="text" placeholder="Rechercher une commune" id = "searchField">
                    <input type="reset" id="resetSearch" value='x'>
-                 </form>
+                   <button id = "refresh">
+                     <i data-feather="refresh-cw" class="feather-icons"></i>
+                   </button>
                </div>
            </div>
        </div>
