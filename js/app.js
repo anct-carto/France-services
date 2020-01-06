@@ -35,9 +35,6 @@ map.attributionControl.addAttribution("<a href = 'https://cartotheque.cget.gouv.
 // position du conteneur
 map.addControl(new L.Control.ZoomMin({position:'topright'}))
 
-let zoomMinImg = document.querySelector('.leaflet-control-zoom-min');
-zoomMinImg.innerHTML = '<i data-feather="map-pin" class = "feather-icons"></i>'
-
 // éléments d'habillage
 let files = ['cercles_drom','reg']
 
@@ -66,9 +63,6 @@ function loadGeoJSON(geojson) {
     });
 }
 
-function refresh() {
-  map.setView([lat, lon], 6);
-}
 /* -------------------------------------------------------------------------- */
 /*                                SIDEBAR                                     */
 /* -------------------------------------------------------------------------- */
@@ -80,7 +74,7 @@ let sidebar = L.control.sidebar({
     position: 'left',     // left or right
 }).addTo(map);
 
-window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('DOMContentLoaded', () => {
   sidebar.open('home');
 })
 
@@ -104,39 +98,59 @@ sidebar.on('content', function (ev) {
     }
 });
 
-let trouvezMoi = document.getElementById('trouvez-moi');
-trouvezMoi.addEventListener('click', () => {
-  sidebar.open('autopan')
-})
-
-
 var userid = 0
 function addUser() {
-    sidebar.addPanel({
-        id:   'user' + userid++,
-        tab:  '<i data-feather="info" class="feather-icons"></i>',
-        title: 'User Profile ' + userid,
-        pane: '<p>user ipsum dolor sit amet</p>',
-    });
+  sidebar.addPanel({
+    id: 'user' + userid++,
+    tab: '<i data-feather="info" class="feather-icons"></i>',
+    title: 'User Profile ' + userid,
+    pane: '<p>user ipsum dolor sit amet</p>',
+  });
 }
 
 feather.replace();
 
+let trouvezMoiBtn = document.getElementById('trouvez-moi');
+
+let searchField = document.getElementById('searchField');
+
+searchField.addEventListener('enter', event => {
+  event.preventDefault();
+})
+
+
+trouvezMoiBtn.addEventListener('click', () => {
+  // ouvre le panneau latéral
+  sidebar.open('autopan');
+  // met le curseur sur la zone de texte 
+  searchField.focus();
+  searchField.select(); 
+});
 
 let maxZoom = 9;
 
 /* -------------------------------------------------------------------------- */
 /*                          COORDONNEES ESPACES                               */
 /* -------------------------------------------------------------------------- */
+/* marker init */
 
-// loadGeoJSON('france_services')
-let searchField = document.getElementById('searchField');
+let customMarker = L.icon({
+  iconUrl: 'img/picto_off1.png',
+  iconSize: [23, 30],
+  // iconAnchor: [12, 30]
+});
+
+console.log(customMarker);
+
 
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
     let france_services = new L.GeoJSON(res,{
-      style:"_style",
+      pointToLayer: (feature,latlng) => {
+        return L.marker(latlng,
+          { icon: customMarker})
+      },
       onEachFeature: function (feature,layer) {
         layer.bindTooltip(feature.properties.lib_france_services);
         layer.on('click', function(e) {
@@ -147,7 +161,7 @@ fetch('data/france_services.geojson')
     }).addTo(map);
 
     listFeatures = res.features.map((e) => {
-      return e.properties;
+      return e.properties.lib_france_services;
     });
 
     console.log(listFeatures);
@@ -158,10 +172,10 @@ fetch('data/france_services.geojson')
     searchField.addEventListener('awesomplete-selectcomplete', e => {
       let value = searchField.value;
       for (let i in listFeatures) {
-        if (listFeatures[i].properties.lib_com.toLowerCase() == value.toLowerCase()) {
-          let libCom = com.toString();
+        console.log(listFeatures[i]);     
+        if (listFeatures[i].toLowerCase() == value.toLowerCase()) {
+          let libCom = value.toString();
           console.log('trouvé'); // vérifier que la commune se trouve dans la liste
-
         }
       }
     })
@@ -171,9 +185,15 @@ fetch('data/france_services.geojson')
 /* -------------------------------------------------------------------------- */
 /*                          CHAMP de RECHERCHE                                */
 /* -------------------------------------------------------------------------- */
+
 // let searchButton = document.getElementById('searchButton');
 
 // // prevent refresh
 // searchButton.addEventListener('click', function(event){
 //   event.preventDefault();
 // });
+
+/* -------------------------------------------------------------------------- */
+/*                          MARQUEUR PONCTUEL                                 */
+/* -------------------------------------------------------------------------- */
+

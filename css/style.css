@@ -4,10 +4,11 @@ body {
 	font-family: 'abel-regular';
 }
 
+
 html, body, #mapid {
 	height: 100%;
 	display: block;
-  overflow-y: hidden;
+  	overflow-y: hidden;
 	font-family: 'abel-regular';
 	font-size: .98em;
 }
@@ -84,7 +85,7 @@ html, body, #mapid {
 #searchField {
 	font-family: 'abel-regular';
 	display: flex;
-	width: 90%;
+	width: 100%;
 	border: none;
 	height: 25px;
 	border-color: transparent;
@@ -96,8 +97,4 @@ html, body, #mapid {
 
 #searchField:focus {
 	outline: none;
-}
-
-#resetSearch {
-	
 }
