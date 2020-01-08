@@ -17,7 +17,7 @@ html, body, #mapid {
 /* 											   		LEAFLET SIDEBAR		 															*/
 /* -------------------------------------------------------------------------- */
 .leaflet-sidebar-header {
-	background-color: #02419a;
+	background-color: #273375;
 	display: block;
 	position: static;
 }
@@ -29,7 +29,7 @@ html, body, #mapid {
 
 .leaflet-sidebar-tabs > ul > li.active,
 .leaflet-sidebar-tabs > ul > li.active:hover {
-	 background-color: #02419a;
+	 background-color: #273375;
  }
 
 .leaflet-sidebar-tabs > ul > li:hover {
@@ -51,11 +51,12 @@ html, body, #mapid {
 
 #logo_fs {
 	padding-top:10px;
-	height:130px;
+	height:137px;
+	vertical-align:middle
 }
 
 #intro {
-	margin-top: 5px;
+	display: block;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,8 +64,9 @@ html, body, #mapid {
 /* -------------------------------------------------------------------------- */
 
 #trouvez-moi {
-	background-color: rgba(0,0,0,.5);
-	left: 15%;
+	width: 100%;
+	background-color: #273375;
+	color:white;
 	font-family: 'abel-regular';
 	font-size: .95em;
 	display: flex;
@@ -74,14 +76,21 @@ html, body, #mapid {
 	border-radius:5px;
 	box-shadow: -0.02px 0 5px rgba(0,0,0,.5);
 	transition: .1ss ease-in-out;
-	/* color: white; */
 	cursor: pointer;
+	justify-content: center;
 }
 
 #trouvez-moi:hover {
-	background: #02419a;
+	background: #273375;
 	color:white;
 	transition: ease-in-out .1s;
+	transform: scale(1.01);
+}
+
+#trouvez-moi-feather {
+	height: 13px;
+	margin: 5px;
+	justify-content: middle;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -132,12 +141,11 @@ hr {
 	margin-top: 20px;
 	border: none;
 	border-top: solid 1px;
-	color:black;
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.75);
+	color:#273375;
 }
 
 /* -------------------------------------------------------------------------- */
-/* 								FICHE DE CONTACT 							  */
+/* 								FICHE d'INFORMATION	 						  */
 /* -------------------------------------------------------------------------- */
 
 .picto-fiche {
@@ -149,4 +157,14 @@ hr {
 	padding-right: 10px;
 };
 
+/* -------------------------------------------------------------------------- */
+/* 									A PROPOS	 						  	  */
+/* -------------------------------------------------------------------------- */
 
+a {
+	background-color:red;
+}
+
+#logo_fs {
+
+}

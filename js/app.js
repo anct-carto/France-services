@@ -1,13 +1,13 @@
 /*
 
-	@ File : map_init.js
+	@ File : app.js
 	@ Author : HC, service cartographie de l'ANCT
-	@ Date : 24/2019
+	@ Created : 24/12/2019
 
 	@ Project : Carte interactive des espaces France Services
 	@ Main file : index.html
 
-	@ Description : script d'initialisation du conteneur et de la carte Leaflet.
+	@ Description : script de fonctionnement principal
 
 */
 
@@ -28,40 +28,44 @@ let map = L.map('mapid', {
     zoomSnap: 0.25,
     zoomControl: false,
     renderer: L.canvas(),
-    // attributionControl: true,
-    // addAttribution:'ANCT'
   }).setView([46.5, 6.8], 5.5555,{animation: true});
+
+// attribution
 map.attributionControl.addAttribution("<a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
+
 // position du conteneur
 map.addControl(new L.Control.ZoomMin({position:'topright'}))
 
 // éléments d'habillage
-let files = ['cercles_drom','reg']
 
 // styles des couches
 let reg_style = {
   fillColor:'#ffeee0',
-  color:'#02419a',
+  // fillColor:'rgb(255, 237, 225)',
+  color:'rgba(0, 0, 0, .4)',
   weight:'1'
 };
 
 let cercles_drom_style = {
   fillColor:'#ffeee0',
-  color:'#02419a',
-  weight:'1'
-}
+  color:'white',
+  weight:'.5'
+};
 
-files.forEach(file => { loadGeoJSON(file)})
+loadGeoJSON('cercles_drom',cercles_drom_style);
+loadGeoJSON('reg',reg_style);
 
-function loadGeoJSON(geojson) {
+// files.forEach(file => { loadGeoJSON(file)})
+
+function loadGeoJSON(geojson,style) {
   fetch('data/' + geojson + '.geojson')
     .then(res => res.json())
     .then(res => {
       new L.GeoJSON(res,{
-        style:geojson+"_style"
+        style:style
       }).addTo(map);
     });
-}
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                SIDEBAR                                     */
@@ -83,13 +87,17 @@ sidebar.on('content', function (ev) {
     switch (ev.id) {
         case 'autopan':
         sidebar.options.autopan = true;
+        searchField.focus();
         break;
         default:
+          searchField.value = ''
+          ficheInfo.innerHTML = '';
         sidebar.options.autopan = true;
     }
 });
 
 var userid = 0
+
 function addUser() {
   sidebar.addPanel({
     id: 'user' + userid++,
@@ -97,7 +105,7 @@ function addUser() {
     title: 'User Profile ' + userid,
     pane: '<p>user ipsum dolor sit amet</p>',
   });
-}
+};
 
 let trouvezMoiBtn = document.getElementById('trouvez-moi');
 
@@ -123,26 +131,26 @@ trouvezMoiBtn.addEventListener('click', () => {
 /* marker init */
 
 let customMarker = L.icon({
-  iconUrl: 'img/picto_off1.png',
+  iconUrl: './img/picto_off1_Plan de travail 1.png',
   iconSize: [23, 30],
-  // iconAnchor: [12, 30]
+  iconAnchor: [12, 30]
 });
 
 let listFs = [];
-
+let france_services
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
-    let france_services = new L.GeoJSON(res,{
-      /* pointToLayer: (feature,latlng) => {
+    france_services = new L.GeoJSON(res,{
+      pointToLayer: (feature,latlng) => {
         return L.marker(latlng,
           { icon: customMarker})
-      }, */
+      },
       onEachFeature: function (feature,layer) {
-        layer.bindTooltip(feature.properties.lib_france_services);
+        layer.bindTooltip(feature.properties.lib_com);
         layer.on('click', function(e) {
-          showInfo(feature.properties)
-          zoomTo(e.latlng)
+          showFiche(feature.properties);
+          zoomTo(e.latlng);
         })
       }
     }).addTo(map);
@@ -159,6 +167,7 @@ fetch('data/france_services.geojson')
           france_services.properties[j] = 'Non renseigné'
         }
       };
+
       /* Remplissage de la liste par les propriétés des entités */
       listFeatures.push(france_services)
     }
@@ -175,7 +184,6 @@ fetch('data/france_services.geojson')
       minChars: 1,
       list: listNouns
     });
-
     
     searchField.addEventListener('awesomplete-selectcomplete', e => {  
       let value = searchField.value; 
@@ -184,10 +192,11 @@ fetch('data/france_services.geojson')
           let libCom = value.toString();
           console.log('trouvé'); // vérifier que la commune se trouve dans la liste
           listFeatures.forEach(feature => {         
-            if (feature.properties.lib_com === libCom) {
+            if (libCom === feature.properties.lib_com) {
               for (let i in feature) {
                 /* affichage de la fiche info */                             
-                showInfo(feature.properties);
+                showFiche(feature.properties);
+                /* zoom sur l'entité */
                 zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);                
               }
             }
@@ -197,10 +206,10 @@ fetch('data/france_services.geojson')
     });
   });
 
-
 /* -------------------------------------------------------------------------- */
 /*                                FICHE INFO                                  */
 /* -------------------------------------------------------------------------- */
+
 /* Fonction permettant de mettre plusieurs attributs en une fois */
 Element.prototype.setAttributes = function (attrs) {
   for (var idx in attrs) {
@@ -214,63 +223,72 @@ Element.prototype.setAttributes = function (attrs) {
   }
 };
 
-/* import des pictos */
-
 /* 1. Création du conteneur accueillant les infos */
 let contentPanel = document.getElementById('autopan');
 let ficheInfo = document.createElement('div')
 ficheInfo.setAttribute('id','ficheInfo');
 
-function showInfo(point) {
+function showFiche(point) {
+  /* initialisation de la fiche */
   ficheInfo.innerHTML = '';
 
+  /* création du séparateur */
   hr = document.createElement('hr');
   
   /* Nom de l'espace France services */
   nomEspace = document.createElement('h3');
   nomEspace.innerText = point.lib_france_services;
 
+  let toto = point.result_label.split(' ');
+
   /* Ligne adresse */
-  let adresse = createPictoInfo('span',point.result_label, 'map-pin');
+  let adresse = createPictoInfo('p',point.result_label, 'map-pin');
 
   /* Création de la table des horaires */
   ficheHoraire = document.createElement('table');
   /* Header de la table 'Horaires' */
+  
   thead = createPictoInfo('thead','Horaires','clock')
   // thead.appendChild(clock);
   thead.style.fontWeight = 'bold'
-  ficheHoraire.appendChild(thead);
-
+  
   /* corps de la table */
   tbody = document.createElement('tbody');
+  
   for (let i in point) {
+    
     if (i[0] == "h") {
       tr = document.createElement('tr');
-
+      
       tdJour = document.createElement('td');
       tdHoraire = document.createElement('td');
-
+      
       jour = i[2].toUpperCase() + i.substring(3, i.length);
-
+      
       tdJour.innerText = jour;
       tdHoraire.innerText = point[i];
-
+      
       tr.appendChild(tdJour);
       tr.appendChild(tdHoraire);
-
       tbody.appendChild(tr);
     }
-  }
-  
-  ficheHoraire.appendChild(tbody)
+  };
+  /* Ajout de l'entête et des lignes */
+  ficheHoraire.appendChild(thead);
+  ficheHoraire.appendChild(tbody);
 
   /* Contact */
-  contact = createPictoInfo('span','Contact','send')
+  contact = createPictoInfo('p','Contact','send');
   
-  elements = [hr, nomEspace, adresse, ficheHoraire, contact];
-  elements.forEach(e => {
+  /* Stockage de tous les éléments de la fiche dans une liste */
+  elementsFiche = [hr, nomEspace, adresse, ficheHoraire, contact];
+
+  /* Ajout au conteneur ficheInfo */
+  elementsFiche.forEach(e => {
     ficheInfo.appendChild(e)
-  })
+  });
+
+  contentPanel.appendChild(ficheInfo);
 
   /* 3. Ajout des infos */
   if (sidebar.open('autopan') == true) {  
@@ -289,21 +307,21 @@ function zoomTo(latlng) {
 
 /* Générer l'affichage des données accompagné de pictos */
 
-function createPictoInfo(htmlElement,data,picName) {
+function createPictoInfo(tag_html,text,svgPic) {
   
   // 1. import du pictogramme
   picto = document.createElement('img');
   picto.setAttributes({
-    'src': 'img/'+ picName + '.svg',
+    'src': 'img/' + svgPic + '.svg',
     'class': 'picto-fiche'
   });
     
   // 2. Génération du texte
-  p = document.createElement('p');
-  element_data = document.createTextNode(data);
+  p = document.createElement(tag_html);
+  text = document.createTextNode(text);
 
   // 3. Fusion texte et picto
-  [picto, element_data].forEach(e => {
+  [picto, text].forEach(e => {
     p.appendChild(e);
   });
 
@@ -312,8 +330,8 @@ function createPictoInfo(htmlElement,data,picName) {
 
 feather.replace();
 
-
 let refreshBtn = document.querySelector('button#refresh');
+
 refreshBtn.addEventListener('click', event => {
   event.preventDefault();
   searchField.value = ''

@@ -29,9 +29,13 @@
                  <i data-feather="search" class = "feather-icons"></i>
                 </a>
                </li>
-           </ul>
-           <!-- bottom aligned tabs -->
-           <ul role="tablist">
+              </ul>
+              <!-- bottom aligned tabs -->
+              <ul role="tablist">
+                <li><a href="#a-propos" role="tab">
+                  <i data-feather="info" class = "feather-icons"></i>
+                </a>
+                </li>
                <li><a href="https://github.com/cget-carto/France-services" target="_blank">
                  <i data-feather="github" class = "feather-icons"></i>
                </a></li>
@@ -47,16 +51,21 @@
                    <i data-feather="skip-back" class="feather-icons"></i>
                  </span>
                </h1>
+               <h3>Carte interactive des espaces
                <img src="img/logo_FranceServices-01.png" id = "logo_fs">
-               <h3 id = 'intro'>
-                 Carte interactive des espaces labellisés au 1er janvier 2020
-               </h3>
+                </h3>
+                <i>
+                  labellisés au 1er janvier 2020
+                </i>  
                <p>
                  Piloté par le ministère de la Cohésion des territoires et des Relations avec les collectivités territoriales via l'ANCT,
                  ce réseau vise à faciliter l’accès des citoyens à un panier de services publics de qualité. Les usagers pourront effectuer
                  diverses démarches administratives dans un lieu unique et se renseigner auprès d’agents polyvalents, formés de manière pointue et efficace.
                </p>
-               <button type="button" name="button" id = "trouvez-moi">Trouver un espace France Services</button>
+               <button type="button" name="button" id = "trouvez-moi">
+                <!-- <i data-feather="search" id = 'trouvez-moi-feather'></i> -->
+                Trouver un espace France Services
+               </button>
                <!-- <h2>More examples</h2>
                <ul>
                    <li><a href="./position-right.html">Right aligned</a></li>
@@ -81,11 +90,32 @@
                    <button id = "refresh">
                      <i data-feather="refresh-cw" class="feather-icons"></i>
                    </button>
-               </div>
+             </div>
+             <div class="leaflet-sidebar-pane" id="a-propos">
+                <h2 class="leaflet-sidebar-header">
+                  À propos
+                  <span class="leaflet-sidebar-close">
+                    <i data-feather="about" class="feather-icons"></i>
+                  </span>
+                </h2>
+                <p>
+                  <b>
+                  Source :
+                </b> CGET 2019, Caisse des dépôts 2020</p>
+                <p>
+                  <b>Réalisation :</b>
+                  <a href = 'https://cartotheque.cget.gouv.fr/cartes' target="_blank">
+                    Service cartographie de l'ANCT</a>, 01/2020
+                </p>
+                <img src="img/logo_anct.png" width="90%">
+                <p><i>En partenariat avec</i></p>
+                <img src="img/logo_bdt.png" width="80%">
+             </div>
            </div>
        </div>
     </div>
     <div id="mapid"></div>
+    <!-- chargement script js -->
     <script type="text/javascript" src= "js/app.js"></script>
   </body>
 </html>
