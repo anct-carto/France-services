@@ -130,27 +130,53 @@ trouvezMoiBtn.addEventListener('click', () => {
 /* -------------------------------------------------------------------------- */
 /* marker init */
 
-let customMarker = L.icon({
-  iconUrl: './img/picto_off1_Plan de travail 1.png',
-  iconSize: [23, 30],
-  iconAnchor: [12, 30]
+let markerOff = L.icon({
+  iconUrl: './img/picto_off.png',
+  iconSize: [9,9]
+  // iconSize: [23, 30],
+  // iconAnchor: [12, 30]
+});
+
+let markerOver = L.icon({
+  iconUrl: './img/picto_over.png',
+  iconSize: [20,20]
+  // iconSize: [23, 30],
+  // iconAnchor: [12, 30]
+});
+
+let markerClicked = L.icon({
+  iconUrl: './img/picto_clicked.png',
+  iconSize: [30, 30]
 });
 
 let listFs = [];
-let france_services
+let france_services; 
+
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
     france_services = new L.GeoJSON(res,{
       pointToLayer: (feature,latlng) => {
         return L.marker(latlng,
-          { icon: customMarker})
+          { icon: markerOff})
       },
       onEachFeature: function (feature,layer) {
-        layer.bindTooltip(feature.properties.lib_com);
-        layer.on('click', function(e) {
+        layer.bindTooltip(feature.properties.lib_com, {
+          direction:'center',
+          className:'leaflet-tooltip'
+        });
+        layer.on('click', e => {
           showFiche(feature.properties);
-          zoomTo(e.latlng);
+          zoomTo(e.latlng);          
+          e.target.setIcon(markerClicked,{className:'clicked'});
+        });
+        layer.on('mouseover', e=> {
+          if (e.target.className != 'clicked') {
+            e.target.setIcon(markerOver)
+          }        
+        });
+        layer.on('mouseout', e => {
+          e.target.setIcon(markerOff)
         })
       }
     }).addTo(map);
@@ -328,8 +354,6 @@ function createPictoInfo(tag_html,text,svgPic) {
   return p;
 }
 
-feather.replace();
-
 let refreshBtn = document.querySelector('button#refresh');
 
 refreshBtn.addEventListener('click', event => {
@@ -342,3 +366,5 @@ refreshBtn.addEventListener('click', event => {
 function resetView() {
   map.setView([46.5, 6.8], 5.5555, { animation: true })
 }
+
+feather.replace();

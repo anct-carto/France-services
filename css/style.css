@@ -43,6 +43,16 @@ html, body, #mapid {
 	 box-shadow: 2px 0px 2px 0px #656565;
 }
 
+.leaflet-tooltip {
+	font-size:1.1em;
+	font-weight:bold;
+	padding:0 5px;
+	border:none;
+	color: white;
+	background-color: rgba(39,51,117,1);
+	margin: -25px 0px;
+}
+
 /* feather icons */
 .feather-icons {
 	margin-top: 25%;
@@ -163,8 +173,4 @@ hr {
 
 a {
 	background-color:red;
-}
-
-#logo_fs {
-
 }
