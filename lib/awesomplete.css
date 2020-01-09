@@ -8,7 +8,7 @@
 }
 
 .awesomplete {
-    display: inline-block;
+    /* display: inline-block; */
     position: relative;
 }
 
@@ -20,7 +20,7 @@
     position: absolute;
     left: 0;
     z-index: 1;
-    min-width: 100%;
+    min-width: 90%;
     box-sizing: border-box;
     list-style: none;
     padding: 0;

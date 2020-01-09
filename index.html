@@ -16,6 +16,15 @@
     <script src="lib/feather.min.js"></script>
   </head>
   <body>
+  <select type="menu" id = "goTo">
+    <option value="">-- Zoomer sur un territoire</i></option>
+    <option value="met">Métropole</option>
+    <option value="reu">La Réunion</option>
+    <option value="glp">Guadeloupe</option>
+    <option value="mtq">Martinique</option>
+    <option value="guf">Guyane</option>
+    <option value="myt">Mayotte</option>
+  </select> 
    <div id="sidebar" class="leaflet-sidebar collapsed">
        <!-- nav tabs -->
        <div class="leaflet-sidebar-tabs">
@@ -81,17 +90,15 @@
                      <i data-feather="skip-back" class="feather-icons"></i>
                    </span>
                </h2>
-               <p>
-                 Rechercher un espace France Services
-               </p>
-               <!-- <div id="searchBar"> -->
-                   <input type="text" placeholder="Rechercher une commune" id = "searchField">
-                   <input type="reset" id="resetSearch" value='x'>
-                   <button id = "refresh">
-                     <i data-feather="refresh-cw" class="feather-icons"></i>
-                   </button>
-             </div>
-             <div class="leaflet-sidebar-pane" id="a-propos">
+               <p>Rechercher un espace France Services</p>
+               <div id = 'search-bar-container'>
+                 <input type="text" placeholder="Rechercher par nom de commune" id = "searchField">
+                 <button id = "refresh">
+                  <i data-feather="x" class="feather-icons"></i>
+                 </button>
+               </div>
+            </div>
+            <div class="leaflet-sidebar-pane" id="a-propos">
                 <h2 class="leaflet-sidebar-header">
                   À propos
                   <span class="leaflet-sidebar-close">
@@ -99,9 +106,7 @@
                   </span>
                 </h2>
                 <p>
-                  <b>
-                  Source :
-                </b> CGET 2019, Caisse des dépôts 2020</p>
+                  <b>Source :</b> CGET 2019, Banque des territoires 2020</p>
                 <p>
                   <b>Réalisation :</b>
                   <a href = 'https://cartotheque.cget.gouv.fr/cartes' target="_blank">
@@ -116,6 +121,7 @@
     </div>
     <div id="mapid"></div>
     <!-- chargement script js -->
-    <script type="text/javascript" src= "js/app.js"></script>
+    <script src= "js/app.js"></script>
+    <script type="javascript">feather.replace()</script>
   </body>
 </html>

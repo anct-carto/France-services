@@ -15,33 +15,31 @@
 /*                                INIT MAP                                    */
 /* -------------------------------------------------------------------------- */
 
-// bloquer le défilement infini de la carte
-let soutWest = L.latLng(55, -23);
-let northEast = L.latLng(37, 26);
-let bounds = L.latLngBounds(soutWest, northEast);
-
 // initialisation de la carte
 let map = L.map('mapid', {
-    maxBounds: bounds,
-    maxZoom: 11,
-    minZoom: 5.5555,
-    zoomSnap: 0.25,
-    zoomControl: false,
-    renderer: L.canvas(),
-  }).setView([46.5, 6.8], 5.5555,{animation: true});
+  zoomSnap: 0.25,
+  zoomControl: false,
+  scale:true,
+  renderer: L.canvas(),
+}).setView([46.5, 2.55], 5.5555,{animation: true});
+
+let carto_db = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: ' Fond cartographique &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
 
 // attribution
-map.attributionControl.addAttribution("<a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
+map.attributionControl
+   .addAttribution("<a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
 
 // position du conteneur
 map.addControl(new L.Control.ZoomMin({position:'topright'}))
 
 // éléments d'habillage
-
 // styles des couches
 let reg_style = {
   fillColor:'#ffeee0',
-  // fillColor:'rgb(255, 237, 225)',
   color:'rgba(0, 0, 0, .4)',
   weight:'1'
 };
@@ -52,11 +50,6 @@ let cercles_drom_style = {
   weight:'.5'
 };
 
-loadGeoJSON('cercles_drom',cercles_drom_style);
-loadGeoJSON('reg',reg_style);
-
-// files.forEach(file => { loadGeoJSON(file)})
-
 function loadGeoJSON(geojson,style) {
   fetch('data/' + geojson + '.geojson')
     .then(res => res.json())
@@ -66,6 +59,35 @@ function loadGeoJSON(geojson,style) {
       }).addTo(map);
     });
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                ZOOM DROM                                   */
+/* -------------------------------------------------------------------------- */
+
+let liste_drom = document.getElementById("goTo");
+
+liste_drom.addEventListener('change', (e) => {
+  option = e.target.selectedOptions[0];
+  console.log(option.value);
+  switch (option.value) {
+    case "met":
+      return map.flyTo([46.5, -3.55], 5.5555, { animation: true, duration: 1 });     
+      // break;
+    case "glp":
+      return map.setView([16.25, -61.706], 10, { animation: true });
+    case "mtq":
+      return map.setView([14.68, -61.2], 10, { animation: true });
+    case "guf":
+      return map.setView([3.92, -54.5], 7.855, { animation: true });
+    case "reu":
+      return map.setView([-21.11, 55.28], 10, { animation: true });
+    case "myt":
+      return map.setView([-12.81, 45.06], 11, { animation: true });
+    default:
+      return map.setView([46.5, 0], 5.5555, { animation: true })
+      // break;
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                SIDEBAR                                     */
@@ -110,38 +132,35 @@ function addUser() {
 let trouvezMoiBtn = document.getElementById('trouvez-moi');
 
 let searchField = document.getElementById('searchField');
-
-searchField.addEventListener('coucou', event => {
-  event.preventDefault();
-})
-
+searchField.addEventListener('keydown', field => {
+  if (field.value != '') {
+    refreshBtn.style.display = 'block'
+  } else {
+    refreshBtn.style.display = 'none'    
+  }
+});
 
 trouvezMoiBtn.addEventListener('click', () => {
   // ouvre le panneau latéral
   sidebar.open('autopan');
   // met le curseur sur la zone de texte 
   searchField.focus();
-  searchField.select(); 
 });
 
 
 /* -------------------------------------------------------------------------- */
 /*                          COORDONNEES ESPACES                               */
 /* -------------------------------------------------------------------------- */
-/* marker init */
 
+/* marker init */
 let markerOff = L.icon({
   iconUrl: './img/picto_off.png',
-  iconSize: [9,9]
-  // iconSize: [23, 30],
-  // iconAnchor: [12, 30]
+  iconSize: [11,11]
 });
 
 let markerOver = L.icon({
   iconUrl: './img/picto_over.png',
-  iconSize: [20,20]
-  // iconSize: [23, 30],
-  // iconAnchor: [12, 30]
+  iconSize: [25,25]
 });
 
 let markerClicked = L.icon({
@@ -207,13 +226,13 @@ fetch('data/france_services.geojson')
     });
 
     new Awesomplete(searchField,{ //
-      minChars: 1,
+      minChars: 2,
       list: listNouns
     });
     
     searchField.addEventListener('awesomplete-selectcomplete', e => {  
       let value = searchField.value; 
-      listNouns.forEach(com => {      
+      listNouns.forEach(com => {
         if (com.toLowerCase() === value.toLowerCase()) {            
           let libCom = value.toString();
           console.log('trouvé'); // vérifier que la commune se trouve dans la liste
@@ -223,7 +242,7 @@ fetch('data/france_services.geojson')
                 /* affichage de la fiche info */                             
                 showFiche(feature.properties);
                 /* zoom sur l'entité */
-                zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);                
+                zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
               }
             }
           })
@@ -299,15 +318,18 @@ function showFiche(point) {
       tbody.appendChild(tr);
     }
   };
+
   /* Ajout de l'entête et des lignes */
   ficheHoraire.appendChild(thead);
   ficheHoraire.appendChild(tbody);
 
   /* Contact */
-  contact = createPictoInfo('p','Contact','send');
+  mail = createPictoInfo('p', point["CONTACT.MAIL"],'mail');
+
+  tel = createPictoInfo('p', point["TELEPHONE"], 'phone')
   
   /* Stockage de tous les éléments de la fiche dans une liste */
-  elementsFiche = [hr, nomEspace, adresse, ficheHoraire, contact];
+    elementsFiche = [hr, nomEspace, adresse, ficheHoraire, mail, tel];
 
   /* Ajout au conteneur ficheInfo */
   elementsFiche.forEach(e => {
@@ -327,8 +349,8 @@ function showFiche(point) {
 
 
 function zoomTo(latlng) {
-  let maxZoom = 9;
-  map.flyTo(latlng, maxZoom, { animate: true, duration: 1 })
+  let maxZoom = 18;
+  map.flyTo(latlng, maxZoom, { animate: true, duration: 2 })
 };
 
 /* Générer l'affichage des données accompagné de pictos */
@@ -352,19 +374,20 @@ function createPictoInfo(tag_html,text,svgPic) {
   });
 
   return p;
-}
+};
 
-let refreshBtn = document.querySelector('button#refresh');
+let refreshBtn = document.getElementById('refresh');
 
 refreshBtn.addEventListener('click', event => {
   event.preventDefault();
+  refreshBtn.style = {display:'none'}
   searchField.value = ''
   ficheInfo.innerHTML = '';
   resetView();
 })
 
 function resetView() {
-  map.setView([46.5, 6.8], 5.5555, { animation: true })
+  map.setView([46.5, 0], 5.5555, { animation: true })
 }
 
 feather.replace();
