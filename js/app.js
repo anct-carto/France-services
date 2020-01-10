@@ -103,6 +103,8 @@ liste_drom.addEventListener('change', (e) => {
   }
 });
 
+
+
 /* -------------------------------------------------------------------------- */
 /*                                SIDEBAR                                     */
 /* -------------------------------------------------------------------------- */
@@ -178,15 +180,19 @@ let markerOver = L.icon({
 
 let markerClicked = L.icon({
   iconUrl: './img/picto_clicked.png',
-  iconSize: [30, 30]
+  iconSize: [35,35]
 });
 
 let marker = {};
 
+
 function addClickedMarker(lat,long,lib_com) {
   removeClickedMarker();
   marker = L.marker([lat, long], { icon: markerClicked })
-            .bindTooltip(lib_com)
+            .bindTooltip(lib_com,{
+              direction:'center',
+              permanent:true,
+              className:'leaflet-tooltip-clicked'})
             .addTo(map);
   zoomTo([lat, long])
 }
@@ -270,15 +276,12 @@ fetch('data/france_services.geojson')
       listNouns.forEach(com => {
         if (com.toLowerCase() === value.toLowerCase()) {            
           let libCom = value.toString();
-          console.log('trouvé'); // vérifier que la commune se trouve dans la liste
           listFeatures.forEach(feature => {
             result = feature.properties.lib_com + ' (' + feature.properties.code_postal + ')';         
             if (libCom === result) {
               for (let i in feature) {
                 /* affichage de la fiche info */                             
                 showFiche(feature.properties);
-                /* zoom sur l'entité */
-                // zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
               }
             }
           })
@@ -286,10 +289,24 @@ fetch('data/france_services.geojson')
       })
     });
   });
-  
+
 /* -------------------------------------------------------------------------- */
 /*                                FICHE INFO                                  */
 /* -------------------------------------------------------------------------- */
+
+// bouton réinitialiser la recherche
+let resetSearchBtn = document.getElementById('resetSearch');
+
+resetSearchBtn.addEventListener('click', event => {
+  event.preventDefault();
+  resetSearchBtn.style = { display: 'none' }
+  searchField.value = ''
+  ficheInfo.innerHTML = '';
+  resetView();
+  removeClickedMarker()
+})
+
+
 
 /* Fonction permettant de mettre plusieurs attributs en une fois */
 Element.prototype.setAttributes = function (attrs) {
@@ -322,7 +339,7 @@ function showFiche(point) {
   nomEspace.innerText = point.lib_france_services;
 
   /* Ligne adresse */
-  let adresse = writeInfo('p', point.ADRESSE + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
+  let adresse = writeInfo('p', point.ADRESSE + ' ' + isNotEmpty(point["COMPLEMENT.D.ADRESSE"]) + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
 
   /* Création de la table des horaires */
   ficheHoraire = document.createElement('table');
@@ -413,19 +430,17 @@ function writeInfo(tag_html,text,svgPic) {
   return p;
 };
 
-let resetSearchBtn = document.getElementById('resetSearch');
-
-resetSearchBtn.addEventListener('click', event => {
-  event.preventDefault();
-  resetSearchBtn.style = {display:'none'}
-  searchField.value = ''
-  ficheInfo.innerHTML = '';
-  resetView();
-  removeClickedMarker()
-})
-
 function resetView() {
   map.setView([46.5, 0], 5.5555, { animation: true })
 }
+
+function isNotEmpty(field) {
+  if (field != "Non renseigné") {
+    return field;
+  } else {
+    return ''
+  }
+}
+
 
 feather.replace();

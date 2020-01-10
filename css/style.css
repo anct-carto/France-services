@@ -50,13 +50,24 @@ html, body, #mapid {
 /* -------------------------------------------------------------------------- */
 
 .leaflet-tooltip {
+	font-size:1em;
+	/* font-weight:bold; */
+	padding:0 5px;
+	border:none;
+	color: white;
+	opacity: 1;
+	background-color: rgba(39,51,117,1);
+	margin: -25px 0px;
+}
+
+.leaflet-tooltip-clicked {
 	font-size:1.1em;
 	font-weight:bold;
 	padding:0 5px;
 	border:none;
 	color: white;
 	background-color: rgba(39,51,117,1);
-	margin: -25px 0px;
+	margin: -35px 0px;
 }
 
 /* feather icons */
