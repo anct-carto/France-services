@@ -1,7 +1,6 @@
 body {
 	padding: 0;
 	margin:0;
-	font-family: 'abel-regular';
 }
 
 
@@ -10,9 +9,10 @@ html, body, #mapid {
 	height: 100%;
 	display: block;
   	overflow-y: hidden;
-	font-family: 'abel-regular';
+	font-family: 'abel-regular', Arial, Helvetica, sans-serif;
 	font-size: .98em;
 }
+
 
 /* -------------------------------------------------------------------------- */
 /* 								LEAFLET SIDEBAR					   	 		  */													
@@ -76,12 +76,13 @@ html, body, #mapid {
 }
 
 #goTo {
+	cursor: pointer;
 	margin-top:10px;
 	right:45px;
 	z-index: 1000;
 	display: block;
 	position: absolute;
-	font-family: 'abel-regular';
+	font-family: 'abel-regular', Arial, Helvetica, sans-serif;
 	font-weight: bolder;
 	border: none;
 	height: 30px;
@@ -92,11 +93,6 @@ html, body, #mapid {
 	outline: none;
 	transition: .2s ease-in-out;
 }
-
-#goTo:focus {
-	outline: none;
-}
-
 
 /* -------------------------------------------------------------------------- */
 /* 							   EXPLORER LES ESPACES	 						  */			
@@ -152,7 +148,7 @@ html, body, #mapid {
 }
 
 /* Bouton d'effacement du cham de recherche */
-#refresh {
+#resetSearch {
 	float: right;
 	display: none;
 	background-color: rgba(0,0,0,0);
@@ -168,22 +164,24 @@ html, body, #mapid {
 	z-index: 1000;
 }
 
-#refresh > .feather-icons {
+#resetSearch > .feather-icons {
 	height: 17px;
 	opacity: .5;
 }
 
 
-#refresh:focus {
+#resetSearch:focus {
 	outline: none;
 }
 
 hr {
-	width:90%;
+	width:65%;
 	margin-top: 20px;
+	margin-right: 20%;
 	border: none;
 	border-top: solid 1px;
 	color:#273375;
+	opacity: .5;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,6 +196,19 @@ hr {
 	height:20px;
 	padding-right: 10px;
 };
+
+td {
+	padding: 10px;
+}
+
+#ficheInfo > table > tbody > tr > td {
+	padding-top:5px;
+	padding-left: 30px;
+}
+
+#ficheInfo > h2 {
+	color:#273375;
+}
 
 /* -------------------------------------------------------------------------- */
 /* 									A PROPOS	 						  	  */

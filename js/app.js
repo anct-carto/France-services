@@ -19,22 +19,35 @@
 let map = L.map('mapid', {
   zoomSnap: 0.25,
   zoomControl: false,
-  scale:true,
   renderer: L.canvas(),
 }).setView([46.5, 2.55], 5.5555,{animation: true});
 
 let carto_db = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   attribution: ' Fond cartographique &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: 'abcd',
-  maxZoom: 19
+  maxZoom: 19,
+  minZoom:5.55
 }).addTo(map);
 
 // attribution
 map.attributionControl
-   .addAttribution("<a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
+   .addAttribution("| <a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
+
+// échelle
+L.control.scale({ position: 'bottomright' }).addTo(map);
 
 // position du conteneur
-map.addControl(new L.Control.ZoomMin({position:'topright'}))
+map.addControl(new L.Control.ZoomMin({position:'topright'}));
+
+// supprimer tous les marqueurs au clic
+// map.addEventListener('click',resetView())
+
+let zoomMin = document.querySelectorAll('.leaflet-control-zoom-min');
+console.log(zoomMin);
+
+zoomMin[0].addEventListener('click', () => {
+  resetView();
+})
 
 // éléments d'habillage
 // styles des couches
@@ -50,6 +63,7 @@ let cercles_drom_style = {
   weight:'.5'
 };
 
+
 function loadGeoJSON(geojson,style) {
   fetch('data/' + geojson + '.geojson')
     .then(res => res.json())
@@ -60,6 +74,7 @@ function loadGeoJSON(geojson,style) {
     });
 };
 
+
 /* -------------------------------------------------------------------------- */
 /*                                ZOOM DROM                                   */
 /* -------------------------------------------------------------------------- */
@@ -68,7 +83,6 @@ let liste_drom = document.getElementById("goTo");
 
 liste_drom.addEventListener('change', (e) => {
   option = e.target.selectedOptions[0];
-  console.log(option.value);
   switch (option.value) {
     case "met":
       return map.flyTo([46.5, -3.55], 5.5555, { animation: true, duration: 1 });     
@@ -134,9 +148,9 @@ let trouvezMoiBtn = document.getElementById('trouvez-moi');
 let searchField = document.getElementById('searchField');
 searchField.addEventListener('keydown', field => {
   if (field.value != '') {
-    refreshBtn.style.display = 'block'
+    resetSearchBtn.style.display = 'block'
   } else {
-    refreshBtn.style.display = 'none'    
+    resetSearchBtn.style.display = 'none'    
   }
 });
 
@@ -147,9 +161,8 @@ trouvezMoiBtn.addEventListener('click', () => {
   searchField.focus();
 });
 
-
 /* -------------------------------------------------------------------------- */
-/*                          COORDONNEES ESPACES                               */
+/*                          MARQUEURS PONCTUELS                               */
 /* -------------------------------------------------------------------------- */
 
 /* marker init */
@@ -168,47 +181,69 @@ let markerClicked = L.icon({
   iconSize: [30, 30]
 });
 
-let listFs = [];
+let marker = {};
+
+function addClickedMarker(lat,long,lib_com) {
+  removeClickedMarker();
+  marker = L.marker([lat, long], { icon: markerClicked })
+            .bindTooltip(lib_com)
+            .addTo(map);
+  zoomTo([lat, long])
+}
+
+function removeClickedMarker() {
+  if (marker != undefined) {
+    map.removeLayer(marker)
+  };
+};
+
+
+/* -------------------------------------------------------------------------- */
+/*                          AFFICHAGE DES POINTS                              */
+/* -------------------------------------------------------------------------- */
+
 let france_services; 
 
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
-    france_services = new L.GeoJSON(res,{
-      pointToLayer: (feature,latlng) => {
-        return L.marker(latlng,
-          { icon: markerOff})
-      },
-      onEachFeature: function (feature,layer) {
-        layer.bindTooltip(feature.properties.lib_com, {
-          direction:'center',
-          className:'leaflet-tooltip'
-        });
-        layer.on('click', e => {
-          showFiche(feature.properties);
-          zoomTo(e.latlng);          
-          e.target.setIcon(markerClicked,{className:'clicked'});
-        });
-        layer.on('mouseover', e=> {
-          if (e.target.className != 'clicked') {
-            e.target.setIcon(markerOver)
-          }        
-        });
-        layer.on('mouseout', e => {
-          e.target.setIcon(markerOff)
-        })
-      }
-    }).addTo(map);
+    console.log(res);
+    
+    res.features.forEach(feature => {
+      lat = feature.properties.LATITUDE;
+      long = feature.properties.LONGITUDE;
 
+      marker = new L.marker([lat,long],{
+         icon: markerOff 
+      }).bindTooltip(feature.properties.lib_com, {
+        direction: 'center',
+        className: 'leaflet-tooltip'
+      }).on('mouseover', e => {
+        if (e.target.className != 'clicked') {
+          e.target.setIcon(markerOver)
+        } else {
+          e.target.setIcon(markerClicked, { className: 'clicked' })
+        }
+      }).on('mouseout', e => {
+        if (e.target.className != 'clicked') {
+          e.target.setIcon(markerOff)
+        } else {
+          e.target.setIcon(markerClicked, { className: 'clicked' })
+        }
+      }).on('click', e => {
+        showFiche(feature.properties);
+      }).addTo(map)      
+    });
+    
     /* Création d'une liste vide pour accueillir les attributs des entités */
     let listFeatures = [];
-
+    
     for (let i in res.features)  {
       let france_services = res.features[i];
       
       /* Remplacement des champs vides par l'attribut 'non renseigné' */
       for (let j in france_services.properties) {
-        if (france_services.properties[j] == null) {
+        if (france_services.properties[j] == "") {
           france_services.properties[j] = 'Non renseigné'
         }
       };
@@ -222,7 +257,7 @@ fetch('data/france_services.geojson')
   /* -------------------------------------------------------------------------- */
     
     let listNouns = res.features.map((e) => {
-      return e.properties.lib_com;
+      return e.properties.lib_com + ' (' + e.properties.code_postal + ')';
     });
 
     new Awesomplete(searchField,{ //
@@ -236,21 +271,22 @@ fetch('data/france_services.geojson')
         if (com.toLowerCase() === value.toLowerCase()) {            
           let libCom = value.toString();
           console.log('trouvé'); // vérifier que la commune se trouve dans la liste
-          listFeatures.forEach(feature => {         
-            if (libCom === feature.properties.lib_com) {
+          listFeatures.forEach(feature => {
+            result = feature.properties.lib_com + ' (' + feature.properties.code_postal + ')';         
+            if (libCom === result) {
               for (let i in feature) {
                 /* affichage de la fiche info */                             
                 showFiche(feature.properties);
                 /* zoom sur l'entité */
-                zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
+                // zoomTo([feature.geometry.coordinates[1], feature.geometry.coordinates[0]]);
               }
             }
           })
-        }  
+        }
       })
     });
   });
-
+  
 /* -------------------------------------------------------------------------- */
 /*                                FICHE INFO                                  */
 /* -------------------------------------------------------------------------- */
@@ -274,6 +310,7 @@ let ficheInfo = document.createElement('div')
 ficheInfo.setAttribute('id','ficheInfo');
 
 function showFiche(point) {
+  addClickedMarker(point.LATITUDE, point.LONGITUDE, point.lib_com)
   /* initialisation de la fiche */
   ficheInfo.innerHTML = '';
 
@@ -281,20 +318,17 @@ function showFiche(point) {
   hr = document.createElement('hr');
   
   /* Nom de l'espace France services */
-  nomEspace = document.createElement('h3');
+  nomEspace = document.createElement('h2');
   nomEspace.innerText = point.lib_france_services;
 
-  let toto = point.result_label.split(' ');
-
   /* Ligne adresse */
-  let adresse = createPictoInfo('p',point.result_label, 'map-pin');
+  let adresse = writeInfo('p', point.ADRESSE + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
 
   /* Création de la table des horaires */
   ficheHoraire = document.createElement('table');
   /* Header de la table 'Horaires' */
   
-  thead = createPictoInfo('thead','Horaires','clock')
-  // thead.appendChild(clock);
+  thead = writeInfo('thead','Horaires','clock')
   thead.style.fontWeight = 'bold'
   
   /* corps de la table */
@@ -323,10 +357,10 @@ function showFiche(point) {
   ficheHoraire.appendChild(thead);
   ficheHoraire.appendChild(tbody);
 
-  /* Contact */
-  mail = createPictoInfo('p', point["CONTACT.MAIL"],'mail');
-
-  tel = createPictoInfo('p', point["TELEPHONE"], 'phone')
+  /* mel */
+  mail = writeInfo('p', point["CONTACT.MAIL"], 'mail');
+  /* tel */
+  tel = writeInfo('p', point["TELEPHONE"], 'phone')
   
   /* Stockage de tous les éléments de la fiche dans une liste */
     elementsFiche = [hr, nomEspace, adresse, ficheHoraire, mail, tel];
@@ -349,24 +383,27 @@ function showFiche(point) {
 
 
 function zoomTo(latlng) {
-  let maxZoom = 18;
-  map.flyTo(latlng, maxZoom, { animate: true, duration: 2 })
+  let maxZoom = 15;
+  map.panTo(latlng, maxZoom, { animate: true, duration: 2 })
 };
 
-/* Générer l'affichage des données accompagné de pictos */
+/* Concaténer information (exemple : adresse) avec picto associé (pin) */
+function writeInfo(tag_html,text,svgPic) {
+  /* dictionnaire des variables :
+   1. tag_html = élément html à créer (exemple : 'p' pour balise <p></p>) 
+   2. text = texte (en format texte) à afficher dans le texte 
+   3. svgPic = nom du fichier .svg à importer */
+   
+ // 1. Génération du texte
+ p = document.createElement(tag_html);
+ text = document.createTextNode(text);
 
-function createPictoInfo(tag_html,text,svgPic) {
-  
-  // 1. import du pictogramme
+  // 2. import du pictogramme
   picto = document.createElement('img');
   picto.setAttributes({
     'src': 'img/' + svgPic + '.svg',
     'class': 'picto-fiche'
   });
-    
-  // 2. Génération du texte
-  p = document.createElement(tag_html);
-  text = document.createTextNode(text);
 
   // 3. Fusion texte et picto
   [picto, text].forEach(e => {
@@ -376,14 +413,15 @@ function createPictoInfo(tag_html,text,svgPic) {
   return p;
 };
 
-let refreshBtn = document.getElementById('refresh');
+let resetSearchBtn = document.getElementById('resetSearch');
 
-refreshBtn.addEventListener('click', event => {
+resetSearchBtn.addEventListener('click', event => {
   event.preventDefault();
-  refreshBtn.style = {display:'none'}
+  resetSearchBtn.style = {display:'none'}
   searchField.value = ''
   ficheInfo.innerHTML = '';
   resetView();
+  removeClickedMarker()
 })
 
 function resetView() {
