@@ -31,7 +31,7 @@ let carto_db = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/
 
 // attribution
 map.attributionControl
-   .addAttribution("| <a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>Agence nationale de la cohésion des territoires</a>");
+   .addAttribution("| <a href = 'https://cartotheque.cget.gouv.fr/' target = '_blank'>ANCT</a>");
 
 // échelle
 L.control.scale({ position: 'bottomright' }).addTo(map);
