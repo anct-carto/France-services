@@ -339,7 +339,7 @@ function showFiche(point) {
   nomEspace.innerText = point.lib_france_services;
 
   /* Ligne adresse */
-  let adresse = writeInfo('p', point.ADRESSE + ' ' + isNotEmpty(point["COMPLEMENT.D.ADRESSE"]) + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
+  let adresse = writeInfo('p', point.ADRESSE + ' - ' + isNotEmpty(point["COMPLEMENT.D.ADRESSE"]) + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
 
   /* Création de la table des horaires */
   ficheHoraire = document.createElement('table');
