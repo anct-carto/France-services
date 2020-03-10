@@ -60,37 +60,29 @@
                    <i data-feather="skip-back" class="feather-icons"></i>
                  </span>
                </h1>
-               <h3>Carte interactive des espaces
-               <img src="img/logo_FranceServices-01.png" id = "logo_fs">
-                </h3>
-                <i>
-                  labellisés en février 2020
-                </i>  
+               <h3><i>Carte interactive</i> <br>
+                 <img src="img/logo_FranceServices-01.png" id = "logo_fs">
+              </h3>
+              <div id = "legende">
+              </div>
                <p>
                  Piloté par le ministère de la Cohésion des territoires et des Relations avec les collectivités territoriales via l'ANCT,
                  ce réseau vise à faciliter l’accès des citoyens à un panier de services publics de qualité. Les usagers pourront effectuer
                  diverses démarches administratives dans un lieu unique et se renseigner auprès d’agents polyvalents, formés de manière pointue et efficace.
                </p>
                <button type="button" name="button" id = "trouvez-moi">
-                <!-- <i data-feather="search" id = 'trouvez-moi-feather'></i> -->
-                Trouver un espace France Services
+                <i data-feather="search" id = 'trouvez-moi-feather'></i>
+                Trouver une France Services
                </button>
-               <!-- <h2>More examples</h2>
-               <ul>
-                   <li><a href="./position-right.html">Right aligned</a></li>
-                   <li><a href="./halfheight.html">The sidebar adapts to map container size</a></li>
-                   <li><a href="./leaflet-latest.html">Proof that it works with the latest leaflet version (if not, please report it!)</a></li>
-                   <li><a href="./leaflet-0.7.html">Proof that it works with leaflet 0.7</a></li>
-               </ul> -->
            </div>
            <div class="leaflet-sidebar-pane" id="autopan">
                <h2 class="leaflet-sidebar-header">
-                   Rechercher un espace
+                   Recherche
                    <span class="leaflet-sidebar-close">
                      <i data-feather="skip-back" class="feather-icons"></i>
                    </span>
                </h2>
-               <p>Rechercher un espace France Services</p>
+               <p>Rechercher une France Services</p>
                <div id = 'search-bar-container'>
                  <input type="text" placeholder="Nom de commune ou code postal" id = "searchField">
                  <button id = "resetSearch">
@@ -122,6 +114,7 @@
     <div id="mapid"></div>
     <!-- chargement script js -->
     <script src= "js/app.js"></script>
+    <script src= "js/legend.js"></script>
     <script type="javascript">feather.replace()</script>
   </body>
 </html>

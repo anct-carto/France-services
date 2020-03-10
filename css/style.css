@@ -105,21 +105,47 @@ html, body, #mapid {
 	transition: .2s ease-in-out;
 }
 
+#legende > ul {
+	font-size: 1em;
+	font-style:italic;
+	font-weight: 500;
+	padding: 0;
+	color:black;
+	list-style: none;
+}
+
+.info-legende {
+	padding-left: 5px;
+	padding-right: 7px;
+	padding-top: 3px;
+	padding-bottom: 2px;
+	background-color:rgba(255,255,255,.95);
+	box-shadow: -0.02px 0 5px rgba(0,0,0,.5);
+	border-radius: 5px;
+}
+
+.picto_legende {
+	width: 12px;
+	height: 12px;
+	padding-right: 5px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* 							   EXPLORER LES ESPACES	 						  */			
 /* -------------------------------------------------------------------------- */
 
 #trouvez-moi {
+	background-color:rgba(0,0,0,0);
+	font-family: 'abel-regular';
+	font-weight: bolder;
 	width: 100%;
-	background-color: #273375;
-	color:white;
 	font-family: 'abel-regular';
 	font-size: .95em;
 	display: flex;
 	border: none;
 	border-color: transparent;
 	padding: 10px;
-	border-radius:5px;
+	border-radius:20px;
 	box-shadow: -0.02px 0 5px rgba(0,0,0,.5);
 	transition: .1ss ease-in-out;
 	cursor: pointer;
@@ -127,15 +153,16 @@ html, body, #mapid {
 }
 
 #trouvez-moi:hover {
-	background: #273375;
+	background-color: #273375;
 	color:white;
-	transition: ease-in-out .1s;
+	transition: ease-in-out .2s;
 	transform: scale(1.01);
 }
 
 #trouvez-moi-feather {
-	height: 13px;
-	margin: 5px;
+	height: 16px;
+	margin: 0px;
+	padding-right: 5px;
 	justify-content: middle;
 }
 
@@ -219,7 +246,66 @@ td {
 
 #ficheInfo > h2 {
 	color:#273375;
+	margin-bottom: 5px;
 }
+
+#text_reseau_fs {
+	font-weight: bolder;
+}
+
+.reseau_principale {
+	color:#19A007;
+	background-color:rgba(0,0,0,0);
+	display: block;
+	font-family: 'abel-regular';
+	font-weight: bolder;
+	font-size: 1em;
+	text-align: center;
+	width: 50%;
+	border-radius: 15px;
+	border: 1px solid #19A007;
+	padding: 5px;
+	margin-bottom: 10px;
+	/* border: none;
+	border-color: transparent; */
+	box-shadow: -0.02px 0 2px rgba(0,0,0,.5);
+}
+
+.reseau_principale:hover {
+	cursor: pointer;
+	background-color: #19A007;
+	color:white;
+	transition: .1s;
+	transform: scale(1.01);
+}
+
+
+.reseau_antenne {
+	color:#273375;
+	background-color:rgba(0,0,0,0);
+	display: block;
+	font-family: 'abel-regular';
+	font-weight: bolder;
+	font-size: 1em;
+	text-align: center;
+	width: 50%;
+	border-radius: 15px;
+	border: 1px solid #273375;
+	padding: 5px;
+	margin-bottom: 10px;
+	/* border: none;
+	border-color: transparent; */
+	box-shadow: -0.02px 0 2px rgba(0,0,0,.5);
+}
+
+.reseau_antenne:hover {
+	cursor: pointer;
+	background-color: #273375;
+	color:white;
+	transition: .1s;
+	transform: scale(1.01);
+}
+
 
 /* -------------------------------------------------------------------------- */
 /* 									A PROPOS	 						  	  */
