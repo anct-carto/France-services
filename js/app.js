@@ -314,8 +314,6 @@ fetch('data/france_services.geojson')
       }).addTo(map)
     });
 
-    map.on('click',removeClickedMarker())
-
     /* Création d'une liste vide pour accueillir les attributs des entités */
     let listFeatures = [];
     
