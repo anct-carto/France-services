@@ -310,20 +310,11 @@ fetch('data/france_services.geojson')
         };
       }).on('click', e => { 
         onClick(tableau_fs, fs)
+        map.zoomTo(coords)
       }).addTo(map)
     });
-    
-/*     let voirFS_btn = document.getElementById('voir_FS');
-    let voirFSI_btn = document.getElementById('voir_itinerante');
-    let voirAnt_btn = document.getElementById('voir_antenne');
-    let voirAntI_btn = document.getElementById('voir_antenne_itinerante');
 
-    let filtre_btn = [voirFS_btn,voirFSI_btn,voirAnt_btn,voirAntI_btn]
-    filtre_btn.forEach(btn => {
-      btn.addEventListener('click', {
-        
-      })
-    }) */
+    map.on('click',removeClickedMarker())
 
     /* Création d'une liste vide pour accueillir les attributs des entités */
     let listFeatures = [];
@@ -696,7 +687,7 @@ function resetView() {
 // faire l'animation de zoom sur la carte
 function zoomTo(latlng) {
   let maxZoom = 15;
-  map.panTo(latlng, maxZoom, { animate: true, duration: 2 });
+  map.setView(latlng, maxZoom, { animate: true, duration: .2 });
 };
 
 
