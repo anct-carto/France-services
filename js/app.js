@@ -321,10 +321,10 @@ fetch('data/france_services.geojson')
     for (let i in tableau_fs)  {
       let france_services = res.features[i];
       
-      /* Remplacement des champs vides par l'attribut 'non renseigné' */
+      /* Remplacement des champs vides par l'attribut 'non communiqué' */
       for (let j in france_services.properties) {
         if (france_services.properties[j] == "") {
-          france_services.properties[j] = 'Non renseigné'
+          france_services.properties[j] = 'Non communiqué'
         }
       };
 
@@ -520,7 +520,7 @@ function showFiche(liste,point) {
     elementsFiche.push(commentaire_horaires);
   };
   
-  if (point.Groupe != 'Non renseigné') {
+  if (point.Groupe != 'Non communiqué') {
     // phrase d'intro
     let text = document.createElement('p');
     text.setAttribute('id','text_reseau_fs');
@@ -556,7 +556,7 @@ function showFiche(liste,point) {
 
 // vérifier si le champ est rempli ou non 
 function isNotEmpty(field) {
-  if (field != "Non renseigné") {
+  if (field != "Non communiqué") {
     return field;
   } else {
     return ''
@@ -578,7 +578,7 @@ function createListe(liste,point) {
     let groupe = e.properties.Groupe;
     let matricule = e.properties.Groupe;
     // si le groupe de l'entité correspond au groupe de l'entité sélectionné ...
-    if (groupe != 'Non renseigné' && groupe == point.Groupe) {
+    if (groupe != 'Non communiqué' && groupe == point.Groupe) {
       tab.push(e); // fait rentrer cette élément dans le tableau vide
     }
   });
