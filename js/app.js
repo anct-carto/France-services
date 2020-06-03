@@ -311,6 +311,7 @@ fetch('data/france_services.geojson')
       }).on('click', e => { 
         onClick(tableau_fs, fs)
         map.zoomTo(coords)
+        // drawNetwork(res, coords, matricule, "Antenne")
       }).addTo(map)
     });
 
@@ -363,6 +364,7 @@ fetch('data/france_services.geojson')
     });
 });
 
+// au clic, faire apparaitre la fiche info et les structures annexes
 function onClick(liste,feature) {
   showFiche(liste, feature);
   createListe(liste, feature);
@@ -684,7 +686,7 @@ function resetView() {
 
 // faire l'animation de zoom sur la carte
 function zoomTo(latlng) {
-  let maxZoom = 15;
+  let maxZoom = 13;
   map.setView(latlng, maxZoom, { animate: true, duration: .2 });
 };
 
