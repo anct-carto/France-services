@@ -206,7 +206,7 @@ function addClickedMarker(lat,long,lib_com,typeMarker) {
               permanent:true,
               className:'leaflet-tooltip-clicked'})
             .addTo(map);
-  // zoomTo([lat, long])
+   zoomTo([lat, long])
 }
 
 // au click suivant, enlever supprimer le marqueur de la carte  
