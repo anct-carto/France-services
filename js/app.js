@@ -206,7 +206,7 @@ function addClickedMarker(lat,long,lib_com,typeMarker) {
               permanent:true,
               className:'leaflet-tooltip-clicked'})
             .addTo(map);
-  zoomTo([lat, long])
+  // zoomTo([lat, long])
 }
 
 // au click suivant, enlever supprimer le marqueur de la carte  
@@ -272,13 +272,13 @@ function switchMarker(categorie,event) {
 let france_services; 
 let polyline;
 
-
 fetch('data/france_services.geojson')
   .then(res => res.json())
   .then(res => {
     let tableau_fs = res.features;
-
+  
     tableau_fs.forEach(feature => {
+      
       let fs = feature.properties;
       // déclaration des variables du tableau;
       let lat = fs.LATITUDE;
@@ -686,8 +686,8 @@ function resetView() {
 
 // faire l'animation de zoom sur la carte
 function zoomTo(latlng) {
-  let maxZoom = 13;
-  map.setView(latlng, maxZoom, { animate: true, duration: .2 });
+  let maxZoom = 5;
+  map.panTo(latlng, maxZoom, { animate: true, duration: .2 });
 };
 
 
