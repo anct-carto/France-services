@@ -105,6 +105,11 @@ sidebar.on('content', function (ev) {
     }
 });
 
+sidebar.on('home', function(ev) {
+  resetView();
+  removeClickedMarker()
+})
+
 var userid = 0
 
 function addUser() {
@@ -214,6 +219,20 @@ function removeClickedMarker() {
   if (marker != undefined) {
     map.removeLayer(marker)
   };
+};
+
+// change l'apparence du picto en fonction du type de fs
+function getCategory(format_fs, itinerance) {
+  switch (format_fs + '-' + itinerance) {
+    case 'Espace labellisé-Non':
+      return 'FS';
+    case 'Espace labellisé-Oui':
+      return 'FS itinerante';
+    case 'Antenne-Non':
+      return 'Antenne';
+    case 'Antenne-Oui':
+      return 'Antenne itinerante';
+  }
 };
 
 // Changer de marqueur en fonction de la catégorie et de l'évènement souris
