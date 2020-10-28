@@ -1,5 +1,6 @@
 # France-services
-Carte interactive des espaces France Services labellisés au 6 février 2020
+Carte interactive des France services labellisées au 1er septembre 2020
 
-Lien d'accès vers la carte : https://cget-carto.github.io/France-services/
 Page officielle : https://www.cohesion-territoires.gouv.fr/france-services   
+
+Les données France services sont collectées et traitées par la Banque des Territoires ; elles sont diffusées au travers de la carte interactive de l'ANCT depuis le 1er janvier 2020. 
