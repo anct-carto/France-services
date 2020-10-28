@@ -4,12 +4,13 @@
 	@ Author : HC, service cartographie de l'ANCT
 	@ Created : 24/12/2019
 
-	@ Project : Carte interactive des espaces France Services
+	@ Project : Carte interactive des structures France Services
 	@ Main file : index.html
 
 	@ Description : script de fonctionnement principal
 
 */
+
 
 /* -------------------------------------------------------------------------- */
 /*                                INIT MAP                                    */
@@ -105,11 +106,6 @@ sidebar.on('content', function (ev) {
     }
 });
 
-sidebar.on('home', function(ev) {
-  resetView();
-  removeClickedMarker()
-})
-
 var userid = 0
 
 function addUser() {
@@ -136,7 +132,7 @@ searchField.addEventListener('keydown', field => {
 trouvezMoiBtn.addEventListener('click', () => {
   // ouvre le panneau latéral
   sidebar.open('autopan');
-  // met le curseur sur la zone de texte 
+  // place le curseur sur la zone de texte 
   searchField.focus();
 });
 
@@ -211,7 +207,7 @@ function addClickedMarker(lat,long,lib_com,typeMarker) {
               permanent:true,
               className:'leaflet-tooltip-clicked'})
             .addTo(map);
-   zoomTo([lat, long])
+  zoomTo([lat, long])
 }
 
 // au click suivant, enlever supprimer le marqueur de la carte  
@@ -233,7 +229,8 @@ function getCategory(format_fs, itinerance) {
     case 'Antenne-Oui':
       return 'Antenne itinerante';
   }
-};
+}
+
 
 // Changer de marqueur en fonction de la catégorie et de l'évènement souris
 function switchMarker(categorie,event) {
@@ -291,22 +288,38 @@ function switchMarker(categorie,event) {
 let france_services; 
 let polyline;
 
-fetch('data/france_services.geojson')
-  .then(res => res.json())
-  .then(res => {
-    let tableau_fs = res.features;
-  
+// chargement google sheet 
+let publicSpreadsheetUrl = "https://docs.google.com/spreadsheets/d/1_i0-v9EOrFhEiHQSk6wdBFpsfaAU0oxjm-pEhviJdxM/edit?usp=sharing"
+
+function init() {
+  Tabletop.init({
+    key: publicSpreadsheetUrl,
+    callback: addData,
+    simpleSheet: true
+  })
+};
+
+tabDrive = [];
+
+window.addEventListener('DOMContentLoaded', init);
+
+function addData(res) {
+    let tableau_fs = res;
+
     tableau_fs.forEach(feature => {
-      
-      let fs = feature.properties;
+           
+      let fs = feature;
       // déclaration des variables du tableau;
-      let lat = fs.LATITUDE;
-      let long = fs.LONGITUDE;
+      let lat = fs.latitude;
+      let long = fs.longitude;
 
       let coords = [lat,long];
 
-      let categorie = fs.categorie;
-      let matricule = fs.MATRICULE;
+      //let categorie = fs.categorie;
+      // determination du type de FS : siège, siège itinérant, antenne, antenne itinérante
+      let categorie = getCategory(fs.format_fs, fs.itinerance);
+
+      let matricule = fs.matricule;
 
       marker = new L.marker(coords,{
         icon: switchMarker(categorie,"default")} 
@@ -338,25 +351,25 @@ fetch('data/france_services.geojson')
     let listFeatures = [];
     
     for (let i in tableau_fs)  {
-      let france_services = res.features[i];
-      
+      let france_services = tableau_fs[i];
+
       /* Remplacement des champs vides par l'attribut 'non communiqué' */
-      for (let j in france_services.properties) {
-        if (france_services.properties[j] == "") {
-          france_services.properties[j] = 'Non communiqué'
+      for (let j in france_services) {
+        
+        if (france_services[j] == "") {
+          france_services[j] = 'Non communiqué'
         }
       };
-
       /* Remplissage de la liste par les propriétés des entités */
       listFeatures.push(france_services)
-    }
-    
+    };
+
   /* -------------------------------------------------------------------------- */
   /*                          CHAMP de RECHERCHE                                */
   /* -------------------------------------------------------------------------- */
     
     let listNouns = tableau_fs.map((e) => {
-      return e.properties.lib_com + ' (' + e.properties.code_postal + ')';
+      return e.lib_com + ' (' + e.code_postal + ')';
     });
 
     new Awesomplete(searchField,{ //
@@ -370,18 +383,20 @@ fetch('data/france_services.geojson')
         if (com.toLowerCase() === value.toLowerCase()) {            
           let libCom = value.toString();
           listFeatures.forEach(feature => {
-            result = feature.properties.lib_com + ' (' + feature.properties.code_postal + ')';         
+            result = feature.lib_com + ' (' + feature.code_postal + ')';         
             if (libCom === result) {    
               for (let i in feature) {
                 /* affichage de la fiche info */                             
-                showFiche(res.features,feature.properties);
+                showFiche(res,feature);
               }
             }
           })
         }
       })
     });
-});
+}
+//);
+
 
 // au clic, faire apparaitre la fiche info et les structures annexes
 function onClick(liste,feature) {
@@ -389,16 +404,17 @@ function onClick(liste,feature) {
   createListe(liste, feature);
 }
 
+
 // dessiner les liaisons entre les structures surla carte
 function drawNetwork(points, coords, matricule, categorie_fs) {
   let liste_markers = [];
-  let liste_points = points.features;
+  let liste_points = points;
 
   liste_points.forEach(e => {
-    let id_responsable = e.properties.Goupe_France_Services_responsable, 
-        categorie = e.properties.FORMAT_FS,
-        lat = e.properties.LATITUDE, 
-        long = e.properties.LONGITUDE;
+    let id_responsable = e.goupe_france_services_responsable, 
+        categorie = e.format_fs,
+        lat = e.latitude, 
+        long = e.longitude;
 
     if (id_responsable == matricule && categorie == categorie_fs) {
       liste_markers.push([lat, long])
@@ -451,16 +467,16 @@ ficheInfo.setAttribute('id','ficheInfo');
 // Création de la fiche info
 function showFiche(liste,point) {
   /* dictionnaire des variables
-  1. tableau des entités
-  2. entité sélectionnée ou trouvée */
+  liste: tableau des entités
+  point: entité sélectionnée ou trouvée */
 
   /* variables utilisées : lattitude et longitude pour ajouter le marqueur, 
   lib_com, categorie et matricule pour jouer le controle de la liste */  
-  let lat = point.LATITUDE,
-      lon = point.LONGITUDE,
+  let lat = point.latitude,
+      lon = point.longitude,
       lib_com = point.lib_com,
-      categorie = point.categorie, /* catégorie de marqueur à appeler */
-      matricule = point.MATRICULE;
+      categorie = getCategory(point.format_fs, point.itinerance), /* catégorie de marqueur à appeler */
+      matricule = point.matricule;
 
   let coords = [lat,lon];
   
@@ -476,13 +492,21 @@ function showFiche(liste,point) {
 
   /* Nom de l'espace France services */
   let nomEspace = document.createElement('h2');
-  nomEspace.innerText = point.lib_france_services;
+  
+  // changer la couleur du nom en fonction du type de FS
+  if (point.format_fs == "Espace labellisé") {
+    nomEspace.style.color = '#19A007'    
+  } else {
+    nomEspace.style.color = '#273375'
+  };
+
+  nomEspace.innerText = point.lib_fs;
 
   let itinerante = document.createElement('i');
   itinerante.setAttribute('id','text_itinerance');
 
   /* Ligne adresse */
-  let adresse = writeInfo('p', point.ADRESSE + ' - ' + isNotEmpty(point["COMPLEMENT.D.ADRESSE"]) + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
+  let adresse = writeInfo('p', point.adresse + ' - ' + isNotEmpty(point.complement_adresse) + ' ' + point.code_postal + ' ' + point.lib_com, 'map-pin');
 
   /* Création de la table des horaires */
   let ficheHoraire = document.createElement('table');
@@ -518,13 +542,13 @@ function showFiche(liste,point) {
   ficheHoraire.appendChild(tbody);
 
   // mel
-  let mail = writeInfo('p', point["CONTACT.MAIL"], 'mail');
+  let mail = writeInfo('p', point.mail, 'mail');
   // telephone
-  let tel = writeInfo('p', point["TELEPHONE"], 'phone')
+  let tel = writeInfo('p', point.telephone, 'phone')
   
   let elementsFiche;
 
-  if (point.ITINERANCE == "Oui") {
+  if (point.itinerance == "Oui") {
     itinerante.innerText = '(Structure itinérante)';
     elementsFiche = [hr, nomEspace, itinerante, adresse, ficheHoraire, mail, tel];
   } else {
@@ -532,18 +556,18 @@ function showFiche(liste,point) {
   }
 
 
-  let commentaire_horaires = isNotEmpty(point["Commentaire.horaires"]);
-  
-  if (commentaire_horaires != '') {
+  let commentaire_horaires = point["commentaire_horaires"];
+
+  if (commentaire_horaires != 'Non communiqué') {
     commentaire_horaires = writeInfo('p',commentaire_horaires,'info')        
     elementsFiche.push(commentaire_horaires);
   };
   
-  if (point.Groupe != 'Non communiqué') {
+  if (point.groupe != 'Non communiqué') {
     // phrase d'intro
     let text = document.createElement('p');
     text.setAttribute('id','text_reseau_fs');
-    text.innerText = 'Cette structure fait partie du réseau "' + point.Groupe + '"';
+    text.innerText = 'Cette structure fait partie du réseau "' + point.groupe + '"';
 
     // creation de la liste des antennes
     createListe(liste, point);
@@ -555,7 +579,7 @@ function showFiche(liste,point) {
     liste_boutons.forEach(button => {
       elementsFiche.push(button);
     })
-  }
+  };
   
   /* Ajout au conteneur ficheInfo */
   elementsFiche.forEach(e => {
@@ -584,29 +608,28 @@ function isNotEmpty(field) {
 
 
 
-// créer la liste des structures et antennes appartenant au même groupe
+// créer la liste des structures et antennes appartenant au même réseau
 function createListe(liste,point) {
   /* dictionnaires des variables :
-  1. la liste des éléments à requêter (ici, le résultat du fetch)
-  2. l'élément sélectionné (ici, le point sur la carte ou l'adresse) */
+  liste: le tableau des éléments à requêter (ici, le résultat du fetch)
+  point: l'élément sélectionné (ici, le point sur la carte ou l'adresse) */
   
   let tab = [];
 
   liste.forEach(e => {    // pour chaque entité parcourue ... 
     // besoin d'interroger la colonne "groupe"
-    let groupe = e.properties.Groupe;
-    let matricule = e.properties.Groupe;
+    let groupe = isNotEmpty(e.groupe);
     // si le groupe de l'entité correspond au groupe de l'entité sélectionné ...
-    if (groupe != 'Non communiqué' && groupe == point.Groupe) {
+    if (groupe != 'Non communiqué' && groupe == point.groupe) {
       tab.push(e); // fait rentrer cette élément dans le tableau vide
     }
   });
 
-  let matricule_point = point.MATRICULE;  
+  let matricule_point = point.matricule;  
   
   // filtre pour retirer la structure déjà sélectionnée;
   tab = tab.filter(e => {     
-    return e.properties.MATRICULE != matricule_point;
+    return e.matricule != matricule_point;
   });
   
   // liste de boutons
@@ -614,8 +637,9 @@ function createListe(liste,point) {
 
   tab.forEach(antenne => {  // pour chaque élément de même groupe du tableau "tab" ...
     // nom et catégorie des structures
-    let lib_antenne = antenne.properties.lib_com;
-    let categorie = antenne.properties.FORMAT_FS;
+    let lib_antenne = antenne.lib_com;
+    let categorie = antenne.format_fs;
+
     // création des boutons de renvoi vers les structures appartenant le même groupe
     let button = document.createElement('button');
     if (categorie == "Espace labellisé") {
@@ -634,7 +658,7 @@ function createListe(liste,point) {
   
     // au click, faire la même chose que sur la carte leaflet
     button.addEventListener('click', () => {
-      onClick(liste, antenne.properties);
+      onClick(liste, antenne);
     });
 
     button.addEventListener("mouseover",() => {
@@ -645,10 +669,6 @@ function createListe(liste,point) {
           lon = layers[i]._latlng.lng;
           lib_com = layers[i]._content
           coords = [lat, lon]
-          if (lib_com == point.lib_com) {
-            // console.log("ok");
-            
-          }
         }
       }
     })
@@ -705,9 +725,9 @@ function resetView() {
 
 // faire l'animation de zoom sur la carte
 function zoomTo(latlng) {
-  let maxZoom = 5;
+  let maxZoom = 13;
   map.panTo(latlng, maxZoom, { animate: true, duration: .2 });
 };
 
-
+// affichage des pictogrammes 
 feather.replace();
