@@ -306,9 +306,12 @@ window.addEventListener('DOMContentLoaded', init);
 function addData(res) {
     let tableau_fs = res;
 
-    tableau_fs.forEach(feature => {
-           
-      let fs = feature;
+    tableau_fs = tableau_fs.filter(feature => {
+      return feature.latitude != '' && feature.longitude != ''
+    });
+
+    tableau_fs.forEach(fs => {
+
       // déclaration des variables du tableau;
       let lat = fs.latitude;
       let long = fs.longitude;
