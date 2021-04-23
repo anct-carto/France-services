@@ -9,6 +9,45 @@
     <link rel="stylesheet" href="lib/L.Control.ZoomMin.css">
     <link rel="stylesheet" href="css/font.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+      #popup {
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      background-color: rgba(0,0,0,0.75);
+      width: 100%;
+      height: 100%;
+      }
+
+      #popup-text {
+        background-color: rgba(255,255,255,.85);
+        width: 22%;
+        border-radius: 5px;
+        font-size: 1.2em;
+        text-align: center;
+        margin: 15% auto;
+        padding: 25px;
+        padding-bottom: 40px;
+      }
+
+      .close-popup {
+        margin-top: -10px;
+        float: right;
+        font-family: 'Arial';
+        font-size: 1.5em;
+        font-weight: bolder;
+      }
+
+      .close-popup:hover,
+      .close-popup:focus {
+        color: rgba(0,0,0,0.5);
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      
+    </style>
     <script src='lib/tabletop.min.js'></script>
     <script src="lib/leaflet.js"></script>
     <script src="lib/leaflet-sidebar.min.js"></script>
@@ -17,6 +56,15 @@
     <script src="lib/feather.min.js"></script>
   </head>
   <body>
+  <div id="popup">
+    <div id="popup-text">
+      <span class="close-popup">&times;</span>
+      <h3>Attention</h3>
+      <span>
+        Cette carte interactive sera bientôt désactivée. Une nouvelle version, dotée d'une entrée de recherche par adresse et par département, est disponible <a href="http://anct-carto.github.io/france_services">ici</a>. 
+      </span>
+    </div>
+  </div>
   <select type="menu" id = "goTo">
     <option value="">-- Zoomer sur un territoire</option>
     <option value="met">Métropole</option>
@@ -118,5 +166,19 @@
     <script src="js/app.js"></script>
     <script src= "js/legend.js"></script>
     <script type="javascript">feather.replace()</script>
+    <script>
+      let popup = document.getElementById('popup');
+      let closePopupCross = document.getElementsByClassName('close-popup')[0];
+        
+        closePopupCross.addEventListener('click', () => {
+          popup.style.display = 'none';
+        });
+
+        window.addEventListener('click', e => {
+          if (e.target == popup) {
+            popup.style.display = 'none';
+          }
+        });
+    </script>
   </body>
 </html>
